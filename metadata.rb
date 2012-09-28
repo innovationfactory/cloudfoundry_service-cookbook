@@ -9,6 +9,6 @@ version          "0.0.1"
   supports os
 end
 
-%w{ cloudfoundry logrotate rbenv }.each do |cb|
+%w{ cloudfoundry-common logrotate rbenv }.each do |cb|
   depends cb
 end
