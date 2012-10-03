@@ -25,4 +25,4 @@ default['cloudfoundry_service']['install_path'] = "/srv/cloudfoundry/services"
 default['cloudfoundry_service']['repo'] = "https://github.com/cloudfoundry/vcap-services.git"
 
 # A reference to a commit (the SHA1 or a branch name) to deploy.
-default['cloudfoundry_service']['reference'] = "1f44c80e218e820d8e9db7a0a118561c5338450c"
+default['cloudfoundry_service']['reference'] = "62f6082d1a0ed03a310518ca31cfceaed32ef503"
