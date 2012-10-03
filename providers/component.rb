@@ -24,16 +24,16 @@ def initialize(name, run_context=nil)
   super
 
   new_resource.service_name(new_resource.name) unless new_resource.service_name
-  new_resource.config_dir(node['cloudfoundry']['config_dir']) unless new_resource.config_dir
-  new_resource.user(node['cloudfoundry']['user']) unless new_resource.user
-  new_resource.pid_dir(node['cloudfoundry']['pid_dir']) unless new_resource.pid_dir
-  new_resource.log_dir(node['cloudfoundry']['log_dir']) unless new_resource.log_dir
+  new_resource.config_dir(node['cloudfoundry_common']['config_dir']) unless new_resource.config_dir
+  new_resource.user(node['cloudfoundry_common']['user']) unless new_resource.user
+  new_resource.pid_dir(node['cloudfoundry_common']['pid_dir']) unless new_resource.pid_dir
+  new_resource.log_dir(node['cloudfoundry_common']['log_dir']) unless new_resource.log_dir
   new_resource.init_service_name("cloudfoundry-#{new_resource.name}") unless new_resource.init_service_name
   new_resource.base_path(node['cloudfoundry_service']['install_path']) unless new_resource.base_path
   new_resource.subdirectory(new_resource.service_name) unless new_resource.subdirectory
 
   # internal
-  new_resource.ruby_version(node['cloudfoundry']['ruby_1_9_2_version']) unless new_resource.ruby_version
+  new_resource.ruby_version(node['cloudfoundry_common']['ruby_1_9_2_version']) unless new_resource.ruby_version
   new_resource.ruby_path(ruby_bin_path(new_resource.ruby_version)) unless new_resource.ruby_path
 
   service_resource = service new_resource.init_service_name do
@@ -45,7 +45,7 @@ end
 
 action :create do
   include_recipe "logrotate"
-  include_recipe "cloudfoundry::default"
+  include_recipe "cloudfoundry-common::default"
 
   installed = install_service if new_resource.install
 
@@ -127,13 +127,13 @@ def add_to_init(config_file, pid_file, log_file)
 
   t2 = template "/etc/init/#{new_resource.init_service_name}.conf" do
     source   "upstart.conf.erb"
-    cookbook "cloudfoundry"
+    cookbook "cloudfoundry-common"
     mode     0644
     variables(
       :component_name => new_resource.init_service_name,
       :user           => new_resource.user,
       :path           => new_resource.ruby_path,
-      :bin_file       => bin_file,
+      :binary         => "#{::File.join(new_resource.ruby_path, 'ruby')} #{bin_file}",
       :config_file    => config_file,
       :pid_file       => pid_file,
       :extra_args     => new_resource.extra_args

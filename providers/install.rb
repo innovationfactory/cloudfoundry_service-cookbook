@@ -32,7 +32,7 @@ def initialize(name, run_context=nil)
   new_resource.user(node['cloudfoundry']['user']) unless new_resource.user
   new_resource.repository(node['cloudfoundry_service']['repo']) unless new_resource.repository
   new_resource.reference(node['cloudfoundry_service']['reference']) unless new_resource.reference
-  new_resource.ruby_version(node['cloudfoundry']['ruby_1_9_2_version']) unless new_resource.ruby_version
+  new_resource.ruby_version(node['cloudfoundry_common']['ruby_1_9_2_version']) unless new_resource.ruby_version
   new_resource.ruby_path(ruby_bin_path(new_resource.ruby_version))
 end
 
@@ -40,6 +40,7 @@ action :update do
   Chef::Log.debug("Running :update for #{new_resource}")
 
   create_target_directory
+  install_package_dependencies
   install_bundler
 
   Chef::Log.debug("Running :update for #{new_resource}: self.class.repository_updated was #{self.class.repository_updated}")
@@ -65,6 +66,15 @@ def create_target_directory
     action :nothing
   end
   d.run_action(:create)
+end
+
+def install_package_dependencies
+  %w( libcurl4-openssl-dev ).each do |pkg|
+    p = package pkg do
+      action :nothing
+    end
+    p.run_action(:install)
+  end
 end
 
 def install_bundler
